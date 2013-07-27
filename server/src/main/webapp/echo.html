@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html ng-app>
+    <head>
+        <title>Echo Demo</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <script src='http://ajax.googleapis.com/ajax/libs/angularjs/1.1.5/angular.js'></script>
+        <script language="javascript" type="text/javascript">
+            function EchoController($scope) {
+                $scope.echoedMessage = "Nothing yet...";
+                $scope.wsocket;
+
+                function connect() {
+                    $scope.wsocket = new WebSocket("ws://localhost:8080/jug-websockets-demo/echo");
+                    $scope.wsocket.onmessage = onMessage;
+                }
+
+                function onMessage(evt) {
+                    console.log("onMessage - " + evt.data);
+                    $scope.echoedMessage = evt.data;
+                    $scope.$apply();
+                }
+                
+                $scope.sendMessage = function() {
+                    console.log("Clicked - " + $scope.message);
+                    $scope.wsocket.send($scope.message);
+                    console.log("Clicked done");
+                };
+                
+                connect();
+            }
+        </script>
+    </head>
+    <body>
+        <div ng-controller="EchoController">
+            <label>{{echoedMessage}}</label>
+            <input id="message" type="text" ng-model="message">
+            <button id="sendMessage" ng-disabled="!message" ng-click="sendMessage()">Echo</button>
+        </div>
+    </body>
+</html>

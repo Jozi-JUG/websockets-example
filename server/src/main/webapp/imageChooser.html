@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html ng-app>
+    <head>
+        <title>Echo Demo</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <script src='http://ajax.googleapis.com/ajax/libs/angularjs/1.1.5/angular.js'></script>
+        <!--        <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+                <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.no-icons.min.css" rel="stylesheet">-->
+
+        <script language="javascript" type="text/javascript">
+            function ImageController($scope) {
+                $scope.echoedMessage = "Nothing yet...";
+                $scope.wsocket;
+
+                function connect() {
+                    $scope.wsocket = new WebSocket("ws://localhost:8080/jug-websockets-demo/imageChooser");
+//                    $scope.wsocket.binaryType = 'arraybuffer';
+                    $scope.wsocket.onmessage = onMessage;
+                }
+
+                function onMessage(evt) {
+                    console.log("onMessage - " + evt.data);
+                    
+                    var canvas = document.getElementById('image');
+                    var image = new Image();
+                    image.onload = function () {
+                        canvas.drawImage(image, 300, 300);// this is line 14
+                    };
+//                    image.src = 'data:image/jpeg;base64,'+Base64.encode(evt.data);
+                    image.src = 'data:image/jpeg;base64,' + evt.data;
+                    
+//                    var canvas = document.getElementById('image');
+//                    var context = canvas.getContext('2d');
+//                    context.drawImage(image, 0, 0);
+                    
+                    
+//                    $scope.echoedMessage = evt.data;
+//                    $scope.$apply();
+//                    var arrayBuffer = evt.data;
+//                    var bytes = new Uint8Array(arrayBuffer);
+//                    console.log("bytes - " + bytes);
+//                    var image = document.getElementById('image');
+//                    image.src = encode(bytes);
+                }
+
+                $scope.sendMessage = function() {
+                    console.log("Clicked - " + $scope.message);
+                    $scope.wsocket.send($scope.message);
+                    console.log("Clicked done");
+                };
+
+                connect();
+            }
+        </script>
+    </head>
+    <body>
+        <div ng-controller="ImageController">
+            <!--            <label>{{echoedMessage}}</label>-->
+            <!--            <input id="message" type="text" ng-model="message">-->
+            <button id="sendMessage" ng-click="sendMessage()">Echo</button>
+            <canvas id="image" width="200" height="100"></canvas>
+        </div>
+    </body>
+</html>
